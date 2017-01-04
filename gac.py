@@ -1,17 +1,20 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
-import sys
-from operator import itemgetter
-import numpy
-from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
+"""Multilayer perceptron."""
+
 import logging
 import logging.config
+import sys
+from operator import itemgetter
+
+import numpy
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+
 try:
     import ConfigParser as configparser
-except importError:
+except ImportError:
     import configparser
 
 
@@ -31,14 +34,13 @@ def get_parameter_from_config(section, parameter):
     try:
         return config.get(section, parameter)
     except:
-        logging.error("No such section : "+section+" or parameter : "+parameter)
+        logging.error("No such section : "+section
+                      + " or parameter : "+parameter)
         sys.exit(1)
 
 
 def init_logging():
-    """
-    Init logging.
-    """
+    """Init logging."""
     logconf_file = get_parameter_from_config("FILES", "logging")
     logging.config.fileConfig(logconf_file)
 
@@ -59,7 +61,7 @@ def import_data():
             one_data = one_line.rstrip().split(';')
             X.append([float(one_data[0])])
             y.append(float(one_data[1]))
-            #res.append(map(float, one_data))
+            # res.append(map(float, one_data))
         op_file.close()
     res.append(X)
     res.append(y)
@@ -83,8 +85,11 @@ def build_mlp(hidden_layer, acti, learning, learning_init, max_it):
     :return: mlp
     :rtype: MLPClassifier
     """
-    return MLPClassifier(hidden_layer_sizes=hidden_layer, activation=acti, solver='sgd',
-            learning_rate=learning, learning_rate_init=learning_init, max_iter=max_it)
+    return MLPClassifier(hidden_layer_sizes=hidden_layer,
+                         activation=acti, solver='sgd',
+                         learning_rate=learning,
+                         learning_rate_init=learning_init,
+                         max_iter=max_it)
 
 
 def summarize_res(x_test, y_test, predictions):
@@ -101,7 +106,7 @@ def summarize_res(x_test, y_test, predictions):
     """
     dejavu = []
     res = []
-    for i,p in enumerate(predictions):
+    for i, p in enumerate(predictions):
         if x_test[i] not in dejavu:
             dejavu.append(x_test[i])
             res.append((x_test[i], float(y_test[i]), float(p)))
@@ -138,8 +143,8 @@ def compute_global_accuracy(expecteds, obtaineds):
     :rtype: float
     """
     summ = 0
-    for x,y in zip(expecteds,obtaineds):
-        summ += compute_accuracy(x,y)
+    for x, y in zip(expecteds, obtaineds):
+        summ += compute_accuracy(x, y)
     return summ/len(expecteds)
 
 
@@ -188,12 +193,12 @@ def test_mlp(mlp, xs, ys, mlp_params, filename):
     :param filename: filename
     :type filename: str
     """
-    res = []
     summaries = []
     accuracies = []
     logging.info("Testing")
     for i in range(10):
-        x_train, x_test, y_train, y_test = train_test_split(xs, ys, random_state=3)
+        x_train, x_test, y_train, y_test = train_test_split(xs, ys,
+                                                            random_state=3)
         y_train = numpy.asarray(y_train, dtype="|S6")
         mlp.fit(x_train, y_train)
         predictions = mlp.predict(x_test)
